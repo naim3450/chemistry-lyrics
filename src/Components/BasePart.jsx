@@ -10,12 +10,14 @@ import { getAduioLyrics } from '../../lines'
 const cardClass = "bg-[#232526] border border-[#2D2F31] rounded-2xl shadow-lg"
 
 const BasePart = () => {
-    const { currentTimeMs, audioName } = useContext(LyricsContext);
+    const { currentTimeMs, audioName, searchAudio } = useContext(LyricsContext);
     const lyricRefs = useRef([]);
 
     const [lyrics, setLyrics] = useState([String]);
     const [activelyrics, setactivelyrics] = useState(String);
     const [activelyricsIndex, setactivelyricsIndex] = useState(0);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [searchData, setsearchData] = useState([]);
 
     const updateLyricsIndex = () => {
         const currentLine = lyrics?.reverse()?.find(line => currentTimeMs >= line.startTimeMs && currentTimeMs <= line.endTimeMs);
@@ -211,20 +213,59 @@ const BasePart = () => {
         { name: "Fell_For_You", audio: Fell_For_You, },
     ];
 
+
+    const handelChnage = (e) => {
+        let val = e.target.value;
+        setSearchTerm(val);
+        let res = musicList?.filter((el) => el?.name?.toLowerCase().includes(val.toLowerCase()));
+        if (val.trim() === "" || res.length == 0) setsearchData([])
+        else setsearchData(res)
+    }
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        setsearchData([]);
+        searchAudio(searchTerm.toLowerCase());
+    }
+
+    const handleSuggestionClick = (el) => {
+        setsearchData([]);
+        searchAudio(el?.toLowerCase());
+    }
+
     return (
         <div className="flex flex-1 justify-between ">
             {/* Left: Search & Info */}
             <section className="w-1/3 space-y-6">
                 {/* Search Card */}
-                <div className={`${cardClass} p-6`}>
-                    <h2 className="text-xl font-semibold mb-4 text-white">Search Lyrics</h2>
+                <form onSubmit={handleSubmit} className={`${cardClass} p-6`}>
+                    <h2 className="text-xl font-semibold mb-4 text-white relative">Search Lyrics</h2>
                     <input
+                        onChange={handelChnage}
                         type="text"
                         placeholder="Enter song name..."
                         className="w-full p-3 rounded-lg bg-[#181A1B] border border-[#2D2F31] text-white mb-4"
                     />
+                    {
+                        searchData.length > 0 &&
+                        <div className="w-full max-h-[200px] overflow-auto border border-[#2D2F31] rounded-md shadow-lg bg-black/300 overflow-y-auto z-[999] mb-3">
+                            {
+                                searchData.map((el, idx) => (
+                                    <div
+                                        name="searchValue"
+                                        key={idx}
+                                        className="px-4 py-2 bg- cursor-pointer text-sm bg-[#2D2F31] hover:bg-[#191919]  text-gray-400 border-b last:border-none"
+                                        onClick={() => handleSuggestionClick(el?.name)}
+                                    >
+                                        {el?.name?.toUpperCase()}
+                                    </div>
+                                ))
+                            }
+                        </div>
+                    }
                     <div className="flex gap-2">
                         <Button
+                            type='submit'
                             className="w-full"
                             variant="contained"
                             style={{
@@ -237,6 +278,7 @@ const BasePart = () => {
                             🔍 Search
                         </Button>
                         <Button
+                            onClick={() => searchAudio('shaky'.toLowerCase())}
                             className="w-full"
                             variant="outlined"
                             style={{
@@ -248,7 +290,7 @@ const BasePart = () => {
                             Demo Lyrics
                         </Button>
                     </div>
-                </div>
+                </form>
                 {/* About Card */}
                 <div className={`${cardClass} p-6`}>
                     <h2 className="text-lg font-semibold mb-2 text-white">About</h2>
@@ -360,7 +402,7 @@ const BasePart = () => {
                     </div>
                 </div>
             </section>
-        </div>
+        </div >
     )
 }
 

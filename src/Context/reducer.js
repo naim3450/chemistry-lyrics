@@ -8,5 +8,12 @@ export const reducer = (state, action) => {
             audioName: audioName
         }
     }
+    if (action.type === "search_audio") {
+        const audioName = action.payload
+        return {
+            ...state,
+            searchAudioName: audioName,
+        }
+    }
     return state
 }

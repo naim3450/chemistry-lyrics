@@ -13,7 +13,9 @@ import { formatTime } from '../../utils/formatTime'
 import LyricsContext from '../Context/LyricsContext'
 
 const Footer = () => {
+
     const songRef = useRef(null);
+    const { searchAudioName, audioCurrentTime } = useContext(LyricsContext);
 
     const musicList = [
         { name: "shaky", audio: shaky, },
@@ -27,13 +29,12 @@ const Footer = () => {
     const [progress, setProgress] = useState(0);
     const [duration, setDuration] = useState(0);
     const [volume, setVolume] = useState(20);
-    const { audioCurrentTime } = useContext(LyricsContext)
 
     useEffect(() => {
         let song = songRef.current;
 
         function handleTimeUpdate() {
-            setProgress(song.currentTime)
+            setProgress(song.currentTime);
         }
         function handleLoadedMetadata() {
             setDuration(song.duration)
@@ -100,6 +101,12 @@ const Footer = () => {
         }
     }, [progress])
 
+    useEffect(() => {
+        // setPlaying(!playing);
+        const findIndex = musicList?.findIndex((el) => el?.name?.toLowerCase() === searchAudioName.toLowerCase());
+        if (findIndex == -1) setindex(0);
+        else { setindex(findIndex); songRef.current.play(); setPlaying(true) };
+    }, [searchAudioName])
 
     return (
         <div className="">

@@ -5,7 +5,8 @@ import { reducer } from './reducer'
 
 const initialState = {
     currentTimeMs: 0,
-    audioName: ''
+    audioName: '',
+    searchAudioName: '',
 }
 
 const LyricsState = ({ children }) => {
@@ -17,9 +18,15 @@ const LyricsState = ({ children }) => {
             payload: { currentTime, audioName }
         })
     }
+    const searchAudio = (audioName) => {
+        dispatch({
+            type: "search_audio",
+            payload: audioName
+        })
+    }
 
     return (
-        <LyricsContext.Provider value={{ ...state, audioCurrentTime }}>
+        <LyricsContext.Provider value={{ ...state, audioCurrentTime, searchAudio }}>
             {children}
         </LyricsContext.Provider>
     )
